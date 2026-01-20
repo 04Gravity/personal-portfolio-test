@@ -1,7 +1,10 @@
 FROM node:20-slim
+
+# Install git so npm can download from GitHub
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 COPY package.json ./
-# This bypasses the need for a lockfile
 RUN npm install
 COPY . .
 EXPOSE 8080
