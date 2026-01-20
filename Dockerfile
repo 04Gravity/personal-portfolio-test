@@ -1,6 +1,6 @@
 FROM node:20-slim
 
-# Install git so npm can download from GitHub
+# Install git so npm can download the Nebula package from GitHub
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
