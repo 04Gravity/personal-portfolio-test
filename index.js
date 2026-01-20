@@ -1,39 +1,45 @@
-import { createBareServer } from "@nebula-services/bare-server-node";
-import wisp from "wisp-server-node";
-import express from "express";
-import { createServer } from "node:http";
-import { SocksProxyAgent } from "socks-proxy-agent";
-const socksProxyAgent = new SocksProxyAgent("socks://localhost:40000");
-import { uvPath } from "@titaniumnetwork-dev/ultraviolet";
-import dotenv from "dotenv";
-import { fileURLToPath } from "url";
-const publicPath = fileURLToPath(new URL("./static/", import.meta.url));
-const bare = createBareServer("/bare/", {});
+import express from 'express';
+import { createServer } from 'node:http';
+import { createBareServer } from '@tomphttp/bare-server-node';
+import { uvPath } from '@titaniumnetwork-dev/ultraviolet';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const bare = createBareServer('/bare/');
 const app = express();
-dotenv.config();
-app.use(express.static(publicPath));
-app.use("/worksheets/uv/", express.static(uvPath));
-app.use("/uv/", express.static(uvPath));
-const server = createServer();
-server.on("request", (req, res) => {
-  if (bare.shouldRoute(req)) {
-    bare.routeRequest(req, res);
-  } else {
-    app(req, res);
-  }
-});
-server.on("upgrade", (req, socket, head) => {
-  if (bare.shouldRoute(req)) {
-    bare.routeUpgrade(req, socket, head);
-  } else {
-    wisp.routeRequest(req, socket, head);
-  }
-});
-const port = process.env.PORT || 3300;
-server.on("listening", () => {
-  console.log(`UP http://localhost:${port}`);
+
+// Load Ultraviolet static files
+app.use('/uv/', express.static(uvPath));
+
+// Serve your frontend files (assuming they are in a folder named 'static' or 'public')
+// If your HTML files are in the main folder, change 'static' to '.'
+app.use(express.static(path.join(__dirname, 'static')));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'static', 'index.html'));
 });
 
-server.listen({
-  port,
+const server = createServer();
+
+server.on('request', (req, res) => {
+    if (bare.shouldRoute(req)) {
+        bare.route(req, res);
+    } else {
+        app(req, res);
+    }
+});
+
+server.on('upgrade', (req, socket, head) => {
+    if (bare.shouldRoute(req)) {
+        bare.routeUpgrade(req, socket, head);
+    } else {
+        socket.end();
+    }
+});
+
+const PORT = process.env.PORT || 8080;
+
+server.listen(PORT, () => {
+    console.log(`Astroid v3 is running on port ${PORT}`);
 });
