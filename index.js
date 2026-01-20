@@ -14,7 +14,7 @@ app.use('/uv/', express.static(uvPath));
 
 // Serve your frontend files (assuming they are in a folder named 'static' or 'public')
 // If your HTML files are in the main folder, change 'static' to '.'
-app.use(express.static(path.join(__dirname, 'static')));
+app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'static', 'index.html'));
@@ -43,3 +43,4 @@ const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
     console.log(`Astroid v3 is running on port ${PORT}`);
 });
+
