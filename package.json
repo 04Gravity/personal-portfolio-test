@@ -1,18 +1,14 @@
 {
-  "name": "personal-portfolio-test",
+  "name": "astroid-v3-fixed",
   "version": "1.0.0",
-  "description": "Astroid v3 Proxy",
-  "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "@fastify/static": "^6.10.1",
-    "@titaniumnetwork-dev/ultraviolet": "^3.2.10",
-    "ultraviolet-static": "github:titaniumnetwork-dev/Ultraviolet-Static",
     "@tomphttp/bare-server-node": "^2.0.1",
-    "@nebula-services/bare-server-node": "github:NebulaServices/bare-server-node"
+    "@titaniumnetwork-dev/ultraviolet": "^3.2.10",
+    "ultraviolet-static": "github:titaniumnetwork-dev/Ultraviolet-Static"
   }
 }
