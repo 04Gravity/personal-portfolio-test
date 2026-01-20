@@ -9,15 +9,22 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const bare = createBareServer('/bare/');
 const app = express();
 
-// Load Ultraviolet static files
+// 1. FIX: Automatically serve Ultraviolet files (The "Engine")
 app.use('/uv/', express.static(uvPath));
 
-// Serve your frontend files (assuming they are in a folder named 'static' or 'public')
-// If your HTML files are in the main folder, change 'static' to '.'
-app.use(express.static(__dirname));
+// 2. FIX: Automatically look for your HTML/JS in all common folders
+app.use(express.static(__dirname)); 
+app.use(express.static(path.join(__dirname, 'static')));
+app.use(express.static(path.join(__dirname, 'public')));
 
+// 3. FIX: Route the main page correctly
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'static', 'index.html'));
+    // This looks for main.html first, then index.html
+    res.sendFile(path.join(__dirname, 'main.html'), (err) => {
+        if (err) res.sendFile(path.join(__dirname, 'index.html'), (err2) => {
+            if (err2) res.status(404).send("Error: Could not find main.html or index.html in your repository.");
+        });
+    });
 });
 
 const server = createServer();
@@ -39,8 +46,6 @@ server.on('upgrade', (req, socket, head) => {
 });
 
 const PORT = process.env.PORT || 8080;
-
 server.listen(PORT, () => {
-    console.log(`Astroid v3 is running on port ${PORT}`);
+    console.log(`Server is live on port ${PORT}`);
 });
-
